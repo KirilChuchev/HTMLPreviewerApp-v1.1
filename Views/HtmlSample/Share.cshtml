@@ -1,0 +1,17 @@
+﻿@model HTMLPreviewerApp.Models.HtmlSample.HtmlSampleShareViewModel
+
+<article>
+    <section>
+        <textarea maxlength="300" rows="10" cols="70">@Model.Rawhtml</textarea>
+    </section>
+    <section>
+        <span>Created by: @Model.User.Email</span>
+
+    </section>
+    <section>
+        <span>Created on: @Model.CreatedOn</span>
+    </section>
+    <section>
+        <span>Last edited on: @Model.LastEditedOn</span>
+    </section>
+</article>

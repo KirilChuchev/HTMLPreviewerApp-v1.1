@@ -1,0 +1,105 @@
+﻿@model HTMLPreviewerApp.Models.HTMLSample.HtmlSampleHomeViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+    var htmlSamples = Model?.HtmlSamples?.OrderByDescending(x => x.CreatedOn).ToList();
+    var currentHtmlSample = Model?.CurrentHtmlSample;
+
+    var currentRawHtml = Model?.CurrentHtmlSample?.RawHtml;
+    var tempRawHtml = Model?.TempRawHtml;
+
+    var currentHtmlSampleIndex =
+        currentHtmlSample != null
+        ? htmlSamples?.FindIndex(x => x.CreatedOn.ToString().Equals(currentHtmlSample?.CreatedOn.ToString(), StringComparison.Ordinal))
+        : null;
+}
+
+@{
+    var modelState = ViewContext.ViewData.ModelState;
+}
+
+<section>
+    <span>@(htmlSamples.Count - currentHtmlSampleIndex)</span>
+    @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
+    {
+        <textarea asp-for="@Model.TempRawHtml" maxlength="300" rows="10" cols="70">@Model.TempRawHtml</textarea>
+        <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" />
+        <input type="submit" name="submitButton" value="Run" />
+        <input type="submit" name="submitButton" value="Save" />
+        <input type="submit" name="submitButton" value="Check original" />
+    }
+</section>
+
+<section>
+    @if (this.TempData["Run"] != null)
+    {
+        @Html.Raw($"<Fragment>{tempRawHtml}</Fragment>");
+    }
+</section>
+
+<section>
+
+    @{
+        for (int i = 0; i <= htmlSamples.Count - 1; i++)
+        {
+            <section>
+                <span>@(htmlSamples.Count - i).</span>
+                <span>Html Sample</span>
+                <span>Created on: @htmlSamples[i].CreatedOn</span>
+                <span>Last edited on: @htmlSamples[i].LastEditedOn</span>
+
+                @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
+                {
+                    <input type="hidden" name="htmlSampleId" value="@htmlSamples[i].Id" />
+                    <input type="submit" style="background-color: darkgrey" value="Open" />
+                }
+
+                <section>
+                    <input type="text" value="@htmlSamples[i].Url" id="@htmlSamples[i].Id" />
+                    <button onclick='copyUrl("@htmlSamples[i].Id")'>Copy shareable Url</button>
+                </section>
+            </section>
+        }
+    }
+</section>
+
+@{
+    if (this.TempData["checkOriginal"] != null)
+    {
+        <script type="text/javascript">
+            window.onload = function () {
+                checkOriginal();
+            };
+        </script>
+    }
+
+    if (this.TempData["submitButton"] != null)
+    {
+        var submitButtonValue = this.TempData["submitButton"];
+        var number = htmlSamples.Count - currentHtmlSampleIndex;
+        <script type="text/javascript">
+            window.onload = function () {
+                showSaveNotification(@number, '@submitButtonValue');
+            };
+        </script>
+    }
+}
+
+<script>
+    function copyUrl(id) {
+        let copyUrlText = document.getElementById(id);
+        copyUrlText.select();
+        copyUrlText.setSelectionRange(0, 99999)
+        document.execCommand("copy");
+        alert("Copied URL: " + copyUrlText.value);
+    }
+
+    function checkOriginal() {
+        let result = "@(currentRawHtml == tempRawHtml)";
+        window.alert(`This sample is ${result == "True" ? "equal" : "not equal"} with the original.`);
+    }
+
+    function showSaveNotification(number, notificationText) {
+        alert(`HTML Sample #${number}. was ${notificationText}!`);
+    }
+</script>
