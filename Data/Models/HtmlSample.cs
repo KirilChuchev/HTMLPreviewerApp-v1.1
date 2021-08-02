@@ -17,6 +17,7 @@
         public string Id { get; set; }
 
         [Required]
+        [MaxLength(5 * 1024)]
         public string RawHtml { get; set; }
 
         [Required]

@@ -12,17 +12,35 @@
         currentHtmlSample != null
         ? htmlSamples?.FindIndex(x => x.CreatedOn.ToString().Equals(currentHtmlSample?.CreatedOn.ToString(), StringComparison.Ordinal))
         : null;
+
+    var newHtmlSampleIndex = $"{htmlSamples.Count - currentHtmlSampleIndex}{(currentHtmlSample != null ? "." : "" )}";
 }
 
 @{
     var modelState = ViewContext.ViewData.ModelState;
+    var errors = modelState.Select(x => x.Value).Select(x => x.Errors).ToArray();
+    var hasErrorHere = false;
 }
 
+<div style="background-color:red" asp-validation-summary="ModelOnly"></div>
+
 <section>
-    <span>@(htmlSamples.Count - currentHtmlSampleIndex)</span>
+    @{
+        if (errors.Length > 0)
+        {
+            hasErrorHere = errors[0]
+                            .Select(x => x.ErrorMessage)
+                            .FirstOrDefault(x => x.Contains("Полето")) != null;
+        }
+
+        
+    }
+
+    <span>@(!hasErrorHere ? newHtmlSampleIndex : "") </span>
     @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
     {
-        <textarea asp-for="@Model.TempRawHtml" maxlength="300" rows="10" cols="70">@Model.TempRawHtml</textarea>
+        <textarea asp-for="TempRawHtml"  rows="10" cols="70">@Model.TempRawHtml</textarea> // maxlength="300"
+        <span style="color:red; background-color:lightyellow" asp-validation-for="TempRawHtml"></span>
         <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" />
         <input type="submit" name="submitButton" value="Run" />
         <input type="submit" name="submitButton" value="Save" />

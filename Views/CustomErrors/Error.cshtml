@@ -1,0 +1,26 @@
+﻿<div class="button-holder d-flex justify-content-center float-sm-left">
+    <a class="btn suls-bg-color" asp-area="" asp-controller="Home" asp-action="Index">Go to Home Page</a>
+</div>
+
+<div class="button-holder d-flex justify-content-center float-sm-right">
+    <a class="btn suls-bg-color" name="action" onclick="history.back()">Back</a>
+</div>
+
+<br />
+<hr />
+
+<div style="padding-top:100px">
+    <h3 class="text-center suls-text-color">
+        On page <b style="color:aquamarine">@Model</b> has encountered a problem!
+    </h3>
+
+    <h4 class="text-center suls-text-color">
+        Please contact
+        <b style="color:aquamarine">
+            <a style="color:aquamarine; text-decoration:underline" asp-area="" asp-controller="Error" asp-action="TechnicalDepartmentDetails">
+                Technical department
+            </a>
+        </b>
+        as soon as possible.
+    </h4>
+</div>
