@@ -61,7 +61,7 @@
             }
             else
             {
-                var htmlSampleId = model.CurrentHtmlSample.Id;
+                var htmlSampleId = model?.CurrentHtmlSample?.Id;
                 return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId });
             }
         }
@@ -72,13 +72,15 @@
         {
             try
             {
-
-                //if (!this.ModelState.IsValid)
-                //{
-                //    return this.View();
-                //}
-
                 var currentUser = await this.userManager.GetUserAsync(this.User);
+
+                if (!this.ModelState.IsValid)
+                {
+                    model.HtmlSamples = await this.htmlSampleService.GetAllHtmlSamplesAsViewModel(currentUser);
+                    return this.View("Index", model);
+                }
+
+                
                 var htmlSample = new HtmlSample(currentUser.Id);
 
                 if (model.CurrentHtmlSample.Id != null)
@@ -101,7 +103,8 @@
             }
             catch
             {
-                return this.RedirectToAction("Index", "HtmlSample");
+                var route = this.Request.Path.Value;
+                return this.View("~/Views/CustomErrors/Error.cshtml", route);
             }
         }
 
