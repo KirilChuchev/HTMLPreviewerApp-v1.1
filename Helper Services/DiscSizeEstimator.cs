@@ -7,9 +7,15 @@
     {
         public static double Estimate(string rawHtmlCode)
         {
+            var size = 0.0;
+
+            if (rawHtmlCode == null)
+            {
+                return size;
+            }
             var byteArr = Encoding.UTF8.GetBytes(rawHtmlCode.Trim());
 
-            var size = Math.Round(((byteArr.Length * 1.0) / 1024) / 1024, 2);
+            size = Math.Round(((byteArr.Length * 1.0) / 1024) / 1024, 2);
 
             return size;
         }

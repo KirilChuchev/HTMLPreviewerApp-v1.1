@@ -1,4 +1,6 @@
-﻿@model HTMLPreviewerApp.Models.HTMLSample.HtmlSampleHomeViewModel
+﻿<link rel="stylesheet" href="/css/htmlSamplePage.css" type="text/css" />
+
+@model HTMLPreviewerApp.Models.HTMLSample.HtmlSampleHomeViewModel
 
 @{
     ViewData["Title"] = "Home Page";
@@ -13,7 +15,7 @@
         ? htmlSamples?.FindIndex(x => x.CreatedOn.ToString().Equals(currentHtmlSample?.CreatedOn.ToString(), StringComparison.Ordinal))
         : null;
 
-    var newHtmlSampleIndex = $"{htmlSamples.Count - currentHtmlSampleIndex}{(currentHtmlSample != null ? "." : "" )}";
+    var newHtmlSampleIndex = $"{htmlSamples.Count - currentHtmlSampleIndex}{(currentHtmlSample != null ? "." : "")}";
 }
 
 @{
@@ -22,64 +24,79 @@
     var hasErrorHere = false;
 }
 
-<div style="background-color:red" asp-validation-summary="ModelOnly"></div>
-
-<section>
-    @{
-        if (errors.Length > 0)
-        {
-            hasErrorHere = errors[0]
-                            .Select(x => x.ErrorMessage)
-                            .FirstOrDefault(x => x.Contains("Полето")) != null;
-        }
-
-        
-    }
-
-    <span>@(!hasErrorHere ? newHtmlSampleIndex : "") </span>
-    @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
-    {
-        <textarea asp-for="TempRawHtml"  rows="10" cols="70">@Model.TempRawHtml</textarea> // maxlength="300"
-        <span style="color:red; background-color:lightyellow" asp-validation-for="TempRawHtml"></span>
-        <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" />
-        <input type="submit" name="submitButton" value="Run" />
-        <input type="submit" name="submitButton" value="Save" />
-        <input type="submit" name="submitButton" value="Check original" />
-    }
-</section>
-
-<section>
-    @if (this.TempData["Run"] != null)
-    {
-        @Html.Raw($"<Fragment>{tempRawHtml}</Fragment>");
-    }
-</section>
-
-<section>
-
-    @{
-        for (int i = 0; i <= htmlSamples.Count - 1; i++)
-        {
-            <section>
-                <span>@(htmlSamples.Count - i).</span>
-                <span>Html Sample</span>
-                <span>Created on: @htmlSamples[i].CreatedOn</span>
-                <span>Last edited on: @htmlSamples[i].LastEditedOn</span>
-
-                @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
+<article class="main-wrapper">
+    <article class="left">
+        <section class="input-wrapper">
+            @{
+                if (errors.Length > 0)
                 {
-                    <input type="hidden" name="htmlSampleId" value="@htmlSamples[i].Id" />
-                    <input type="submit" style="background-color: darkgrey" value="Open" />
+                    hasErrorHere = errors[0]
+                                    .Select(x => x.ErrorMessage)
+                                    .FirstOrDefault(x => x.Contains("Полето")) != null;
                 }
 
-                <section>
-                    <input type="text" value="@htmlSamples[i].Url" id="@htmlSamples[i].Id" />
-                    <button onclick='copyUrl("@htmlSamples[i].Id")'>Copy shareable Url</button>
+
+            }
+
+            <span class="number">@(!hasErrorHere ? newHtmlSampleIndex : "") </span>
+            @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
+            {
+                <div class="error-message" asp-validation-summary="ModelOnly"></div>
+                <textarea asp-for="TempRawHtml" rows="10" cols="70">@Model.TempRawHtml</textarea>
+                <span class="error-message" asp-validation-for="TempRawHtml"></span>
+                <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" />
+                <section class="button-wrapper">
+                    <input class="submit-button" type="submit" name="submitButton" value="Run" />
+                    <input class="submit-button" type="submit" name="submitButton" value="Save" />
+                    <input class="submit-button" type="submit" name="submitButton" value="Check original" />
                 </section>
-            </section>
-        }
-    }
-</section>
+            }
+        </section>
+
+        <section class="samples-list-wrapper">
+            <span class="samples-list-title">Html Samples:</span>
+
+            @{
+                for (int i = 0; i <= htmlSamples.Count - 1; i++)
+                {
+                    <section class="sample-wrapper">
+                        <section class="first-row">
+                            <span>@(htmlSamples.Count - i).</span>
+                            @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
+                            {
+                                <input type="hidden" name="htmlSampleId" value="@htmlSamples[i].Id" />
+                                <input type="submit" style="background-color: darkgrey" value="Open" />
+                            }
+                            <span>Created on: @htmlSamples[i].CreatedOn</span>
+                            <span>Last edited on: @htmlSamples[i].LastEditedOn</span>
+
+
+                        </section>
+
+                        <section class="second-row">
+                            <input type="text" value="@htmlSamples[i].Url" id="@htmlSamples[i].Id" />
+                            <button onclick='copyUrl("@htmlSamples[i].Id")'>Copy shareable Url</button>
+                        </section>
+                    </section>
+                }
+            }
+        </section>
+    </article>
+
+    <article class="right">
+        <section class="preview">
+            @if (this.TempData["Run"] != null)
+            {
+                <span class="preview-content">
+                    @Html.Raw($"<fragment>{tempRawHtml}</fragment>")
+
+                </span>
+
+            }
+        </section>
+    </article>
+</article>
+
 
 @{
     if (this.TempData["checkOriginal"] != null)
@@ -96,9 +113,9 @@
         var submitButtonValue = this.TempData["submitButton"];
         var number = htmlSamples.Count - currentHtmlSampleIndex;
         <script type="text/javascript">
-            window.onload = function () {
-                showSaveNotification(@number, '@submitButtonValue');
-            };
+    window.onload = function () {
+        showSaveNotification(@number, '@submitButtonValue');
+    };
         </script>
     }
 }
