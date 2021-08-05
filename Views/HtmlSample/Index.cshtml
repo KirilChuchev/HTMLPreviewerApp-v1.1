@@ -112,11 +112,13 @@
     {
         var submitButtonValue = this.TempData["submitButton"];
         var number = htmlSamples.Count - currentHtmlSampleIndex;
-        <script type="text/javascript">
+        @*<script type="text/javascript">
     window.onload = function () {
         showSaveNotification(@number, '@submitButtonValue');
     };
-        </script>
+        </script>*@
+
+        <script>showSaveNotification(@number, '@submitButtonValue');</script>
     }
 }
 
@@ -129,7 +131,5 @@
         alert("Copied URL: " + copyUrlText.value);
     }
 
-    function showSaveNotification(number, notificationText) {
-        alert(`HTML Sample #${number}. was ${notificationText}!`);
-    }
+    
 </script>

@@ -6,3 +6,7 @@
 function checkOriginal(value) {
     alert(`This sample is ${value} with the original.`);
 }
+
+function showSaveNotification(number, notificationText) {
+    alert(`HTML Sample #${number}. was ${notificationText}!`);
+}
