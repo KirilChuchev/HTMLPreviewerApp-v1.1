@@ -76,7 +76,7 @@
 
                         <section class="second-row">
                             <input type="text" value="@htmlSamples[i].Url" id="@htmlSamples[i].Id" />
-                            <button onclick='copyUrl("@htmlSamples[i].Id")'>Copy shareable Url</button>
+                            <button onclick=copyUrl("@htmlSamples[i].Id")>Copy shareable Url</button>
                         </section>
                     </section>
                 }
@@ -112,24 +112,7 @@
     {
         var submitButtonValue = this.TempData["submitButton"];
         var number = htmlSamples.Count - currentHtmlSampleIndex;
-        @*<script type="text/javascript">
-    window.onload = function () {
-        showSaveNotification(@number, '@submitButtonValue');
-    };
-        </script>*@
 
         <script>showSaveNotification(@number, '@submitButtonValue');</script>
     }
 }
-
-<script>
-    function copyUrl(id) {
-        let copyUrlText = document.getElementById(id);
-        copyUrlText.select();
-        copyUrlText.setSelectionRange(0, 99999)
-        document.execCommand("copy");
-        alert("Copied URL: " + copyUrlText.value);
-    }
-
-    
-</script>
