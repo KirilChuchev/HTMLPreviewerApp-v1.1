@@ -1,4 +1,5 @@
 ﻿<link rel="stylesheet" href="/css/htmlSamplePage.css" type="text/css" />
+<script src="~/js//site.js" type="text/javascript"></script>
 
 @model HTMLPreviewerApp.Models.HTMLSample.HtmlSampleHomeViewModel
 
@@ -101,11 +102,10 @@
 @{
     if (this.TempData["checkOriginal"] != null)
     {
-        <script type="text/javascript">
-            window.onload = function () {
-                checkOriginal();
-            };
-        </script>
+        var value = Model.IsEqualWithOriginal == true ? "equal" : "not equal";
+
+        <script>checkOriginal(`@(value)`)</script>
+
     }
 
     if (this.TempData["submitButton"] != null)
@@ -127,11 +127,6 @@
         copyUrlText.setSelectionRange(0, 99999)
         document.execCommand("copy");
         alert("Copied URL: " + copyUrlText.value);
-    }
-
-    function checkOriginal() {
-        let result = "@(currentRawHtml == tempRawHtml)";
-        window.alert(`This sample is ${result == "True" ? "equal" : "not equal"} with the original.`);
     }
 
     function showSaveNotification(number, notificationText) {

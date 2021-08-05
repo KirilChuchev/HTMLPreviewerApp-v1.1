@@ -40,7 +40,7 @@
                 model.TempRawHtml = model?.CurrentHtmlSample?.RawHtml;
             }
 
-
+            model.IsEqualWithOriginal = model.TempRawHtml == model.CurrentHtmlSample?.RawHtml;
 
             return this.View(model);
         }
