@@ -16,6 +16,8 @@
 
         public string TempRawHtml { get; set; }
 
+        public bool IsEqualWithOriginal { get; set; }
+
         public ICollection<HtmlSampleViewModel> HtmlSamples { get; set; }
 
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
