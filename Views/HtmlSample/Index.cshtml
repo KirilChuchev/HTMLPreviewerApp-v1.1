@@ -63,9 +63,9 @@
                     <section class="sample-wrapper">
                         <section class="first-row">
                             <span>@(htmlSamples.Count - i).</span>
-                            @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
+                            @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Post))
                             {
-                                <input type="hidden" name="htmlSampleId" value="@htmlSamples[i].Id" />
+                                <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" value="@htmlSamples[i].Id" />
                                 <input type="submit" style="background-color: darkgrey" value="Open" />
                             }
                             <span>Created on: @htmlSamples[i].CreatedOn</span>

@@ -1,20 +1,15 @@
-﻿using HTMLPreviewerApp.Data.Models;
-using HTMLPreviewerApp.Models.HtmlSample;
-using HTMLPreviewerApp.Models.HTMLSample;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace HTMLPreviewerApp.Services
+﻿namespace HTMLPreviewerApp.Services
 {
+    using HTMLPreviewerApp.Models.HtmlSample;
+    using HTMLPreviewerApp.Models.HTMLSample;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+
     public interface IHtmlSampleService
     {
-        Task<HtmlSample> SaveHtmlSample(HtmlSample rawHtml);
+        Task<string> SaveHtmlSample(HtmlSampleHomeViewModel homeModel);
 
-        Task<HtmlSample> EditHtmlSample(string htmlSampleId, string rawHtml);
-
-        Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSamplesAsViewModel(ApplicationUser currentUser);
+        Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSampleViewModelsByUserId(string userId);
 
         Task<HtmlSampleViewModel> GetHtmlSampleViewModelById(string htmlSampleId);
     }
