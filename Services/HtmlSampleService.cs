@@ -63,6 +63,13 @@
             };
         }
 
+        public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel)
+        {
+            var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.CurrentHtmlSample.Id);
+
+            return htmlSample.RawHtml == homeModel.TempRawHtml;
+        }
+
         private async Task<string> SaveNewHtmlSample(HtmlSampleHomeViewModel homeModel)
         {
             var entity = await this.dbContext

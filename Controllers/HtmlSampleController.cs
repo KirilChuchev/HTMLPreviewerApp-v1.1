@@ -78,6 +78,12 @@
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
 
+            if (!this.ModelState.IsValid)
+            {
+                homeModel.HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id);
+                return this.View("Index", homeModel);
+            }
+
             if (submitButton == "Run")
             {
                 return this.RunHtmlSample(homeModel);
@@ -86,11 +92,7 @@
             {
                 homeModel.CurrentHtmlSample.UserId = currentUser.Id;
 
-                if (!this.ModelState.IsValid)
-                {
-                    homeModel.HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id);
-                    return this.View("Index", homeModel);
-                }
+                
                
                 var id = await this.htmlSampleService.SaveHtmlSample(homeModel);
                 return this.RedirectToAction("Index", "HtmlSample", new { id });
@@ -98,7 +100,10 @@
             }
             else if (submitButton == "Check original")
             {
-                return this.CheckOriginal(homeModel);
+                var id = homeModel.CurrentHtmlSample.Id;
+                this.TempData["tempRawHtml"] = homeModel.TempRawHtml;
+                this.TempData["checkOriginal"] = "activated";
+                return this.RedirectToAction("Index", "HtmlSample", new { id });
             }
             else
             {
@@ -170,16 +175,16 @@
             return View(model);
         }
 
-        [ValidateAntiForgeryToken]
-        public IActionResult CheckOriginal(HtmlSampleHomeViewModel model)
-        {
-            if (model.TempRawHtml != null)
-            {
-                TempData["checkOriginal"] = true;
-            }
-            var htmlSampleId = model.CurrentHtmlSample?.Id;
-            var tempRawHtml = model.TempRawHtml;
-            return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId, tempRawHtml });
-        }
+        //[ValidateAntiForgeryToken]
+        //public IActionResult CheckOriginal(HtmlSampleHomeViewModel model)
+        //{
+        //    if (model.TempRawHtml != null)
+        //    {
+        //        TempData["checkOriginal"] = true;
+        //    }
+        //    var htmlSampleId = model.CurrentHtmlSample?.Id;
+        //    var tempRawHtml = model.TempRawHtml;
+        //    return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId, tempRawHtml });
+        //}
     }
 }

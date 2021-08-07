@@ -12,5 +12,7 @@
         Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSampleViewModelsByUserId(string userId);
 
         Task<HtmlSampleViewModel> GetHtmlSampleViewModelById(string htmlSampleId);
+
+        Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel);
     }
 }
