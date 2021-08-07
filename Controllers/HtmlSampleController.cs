@@ -21,15 +21,6 @@
             this.userManager = userManager;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Index(HtmlSampleHomeViewModel homeModel)
-        {
-            var id = homeModel.CurrentHtmlSample?.Id;
-            this.TempData["tempRawHtml"] = homeModel.TempRawHtml;
-            return this.RedirectToAction("Index", new { id });
-        }
-
         public async Task<IActionResult> Index(string id)
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
