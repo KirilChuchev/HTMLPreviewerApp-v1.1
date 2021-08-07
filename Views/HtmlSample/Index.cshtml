@@ -49,15 +49,15 @@
             <span class="samples-list-title">Html Samples:</span>
 
             @{
-                var id = Model.CurrentHtmlSample?.Id;
                 for (int i = 0; i <= htmlSamples.Count - 1; i++)
                 {
+                    var id = htmlSamples[i].Id;
                     <section class="sample-wrapper">
                         <section class="first-row">
                             <span>@(htmlSamples.Count - i).</span>
                             @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
                             {
-                                <input type="hidden" asp-for="@id" id="hidden-@id-@i" value="@htmlSamples[i].Id" />
+                                <input type="hidden" asp-for="@id" id="hidden-@id-@i" value="@id" />
                                 <input type="submit" style="background-color: darkgrey" value="Open" />
                             }
                             <span>Created on: @htmlSamples[i].CreatedOn</span>
