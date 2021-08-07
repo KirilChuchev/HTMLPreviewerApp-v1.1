@@ -21,99 +21,60 @@
             this.userManager = userManager;
         }
 
-        public async Task<IActionResult> Index(string htmlSampleId, string tempRawHtml = null)
+        public async Task<IActionResult> Index(string id)
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
 
-            var model = new HtmlSampleHomeViewModel()
+            var currentHtmlSample = await this.htmlSampleService.GetHtmlSampleViewModelById(id);
+
+            var homeModel = new HtmlSampleHomeViewModel()
             {
-                HtmlSamples = await this.htmlSampleService.GetAllHtmlSamplesAsViewModel(currentUser),
-                CurrentHtmlSample = await this.htmlSampleService.GetHtmlSampleViewModelById(htmlSampleId),
+                CurrentHtmlSample = currentHtmlSample,
+                HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id),
+                TempRawHtml = this.TempData["tempRawHtml"] as string,
             };
 
-            if (tempRawHtml != null)
-            {
-                model.TempRawHtml = tempRawHtml;
-            }
-            else
-            {
-                model.TempRawHtml = model?.CurrentHtmlSample?.RawHtml;
-            }
+            homeModel.TempRawHtml = TempData["tempRawHtml"] as string ?? homeModel.CurrentHtmlSample?.RawHtml;
+            homeModel.IsEqualWithOriginal = homeModel.CurrentHtmlSample?.RawHtml == homeModel.TempRawHtml;
 
-            model.IsEqualWithOriginal = model.TempRawHtml == model.CurrentHtmlSample?.RawHtml;
-
-            return this.View(model);
-        }
-
-        public async Task<IActionResult> SwitchAction(HtmlSampleHomeViewModel model, string submitButton)
-        {
-            if (submitButton == "Run")
-            {
-                return this.RunHtmlSample(model);
-            }
-            else if (submitButton == "Save")
-            {
-                return await this.SaveHtmlSample(model);
-            }
-            else if (submitButton == "Check original")
-            {
-                return this.CheckOriginal(model);
-            }
-            else
-            {
-                var htmlSampleId = model?.CurrentHtmlSample?.Id;
-                return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId });
-            }
+            return this.View(homeModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SaveHtmlSample(HtmlSampleHomeViewModel model)
+        public async Task<IActionResult> SwitchAction(HtmlSampleHomeViewModel homeModel, string submitButton)
         {
-            try
+            var currentUser = await this.userManager.GetUserAsync(this.User);
+
+            if (!this.ModelState.IsValid)
             {
-                var currentUser = await this.userManager.GetUserAsync(this.User);
-
-                if (!this.ModelState.IsValid)
-                {
-                    model.HtmlSamples = await this.htmlSampleService.GetAllHtmlSamplesAsViewModel(currentUser);
-                    return this.View("Index", model);
-                }
-
-                
-                var htmlSample = new HtmlSample(currentUser.Id);
-
-                if (model.CurrentHtmlSample.Id != null)
-                {
-                    this.TempData["submitButton"] = "edited";
-                    htmlSample = await this.htmlSampleService.EditHtmlSample(model.CurrentHtmlSample.Id, model.TempRawHtml);
-                }
-                else
-                {
-                    this.TempData["submitButton"] = "saved";
-                    htmlSample = await this.htmlSampleService.SaveHtmlSample(new HtmlSample(currentUser.Id)
-                    {
-                        RawHtml = model.TempRawHtml,
-                    });
-                }
-
-                var htmlSampleId = htmlSample.Id;
-
-                return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId });
+                homeModel.HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id);
+                return this.View("Index", homeModel);
             }
-            catch
+            
+            string id;
+            this.TempData["submitButton"] = submitButton;
+            this.TempData["tempRawHtml"] = homeModel.TempRawHtml;
+
+            switch (submitButton)
             {
-                var route = this.Request.Path.Value;
-                return this.View("~/Views/CustomErrors/Error.cshtml", route);
+                case "Run":
+                    id = homeModel.CurrentHtmlSample?.Id;
+                    break;
+                case "Save":
+                    TempData["save-action-type"] = homeModel.CurrentHtmlSample?.Id == null ? "saved" : "edited";
+                    homeModel.CurrentHtmlSample.UserId = currentUser.Id;
+                    id = await htmlSampleService.SaveHtmlSample(homeModel);
+                    break;
+                case "Check original":
+                    id = homeModel.CurrentHtmlSample.Id;
+                    break;
+                default:
+                    id = homeModel?.CurrentHtmlSample?.Id;
+                    break;
             }
-        }
 
-        public IActionResult RunHtmlSample(HtmlSampleHomeViewModel model)
-        {
-            this.TempData["Run"] = true;
-            var htmlSampleId = model.CurrentHtmlSample.Id;
-            var tempRawHtml = model.TempRawHtml;
-            return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId, tempRawHtml });
+            return this.RedirectToAction("Index", "HtmlSample", new { id });
         }
 
         [AllowAnonymous]
@@ -122,24 +83,12 @@
             var htmlSample = await this.htmlSampleService.GetHtmlSampleViewModelById(htmlSampleId);
             var model = new HtmlSampleShareViewModel()
             {
-                Rawhtml = htmlSample.RawHtml,
+                RawHtml = htmlSample.RawHtml,
                 User = await this.userManager.FindByIdAsync(htmlSample.UserId),
                 CreatedOn = htmlSample.CreatedOn,
                 LastEditedOn = htmlSample.LastEditedOn,
             };
             return View(model);
-        }
-
-        [ValidateAntiForgeryToken]
-        public IActionResult CheckOriginal(HtmlSampleHomeViewModel model)
-        {
-            if (model.TempRawHtml != null)
-            {
-                TempData["checkOriginal"] = true;
-            }
-            var htmlSampleId = model.CurrentHtmlSample.Id;
-            var tempRawHtml = model.TempRawHtml;
-            return this.RedirectToAction("Index", "HtmlSample", new { htmlSampleId, tempRawHtml });
         }
     }
 }

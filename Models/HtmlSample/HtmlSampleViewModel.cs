@@ -1,11 +1,8 @@
-﻿using HTMLPreviewerApp.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace HTMLPreviewerApp.Models.HtmlSample
+﻿namespace HTMLPreviewerApp.Models.HtmlSample
 {
+    using HTMLPreviewerApp.Data.Models;
+    using System;
+
     public class HtmlSampleViewModel
     {
         public string Id { get; set; }

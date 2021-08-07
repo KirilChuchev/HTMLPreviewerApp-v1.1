@@ -8,9 +8,6 @@
     var htmlSamples = Model?.HtmlSamples?.OrderByDescending(x => x.CreatedOn).ToList();
     var currentHtmlSample = Model?.CurrentHtmlSample;
 
-    var currentRawHtml = Model?.CurrentHtmlSample?.RawHtml;
-    var tempRawHtml = Model?.TempRawHtml;
-
     var currentHtmlSampleIndex =
         currentHtmlSample != null
         ? htmlSamples?.FindIndex(x => x.CreatedOn.ToString().Equals(currentHtmlSample?.CreatedOn.ToString(), StringComparison.Ordinal))
@@ -23,41 +20,36 @@
     var modelState = ViewContext.ViewData.ModelState;
     var errors = modelState.Select(x => x.Value).Select(x => x.Errors).ToArray();
     var hasErrorHere = false;
+    if (errors.Length > 0)
+    {
+        hasErrorHere = errors[0]
+                        .Select(x => x.ErrorMessage)
+                        .FirstOrDefault(x => x.Contains("Полето")) != null;
+    }
 }
 
 <article class="main-wrapper">
     <article class="left">
         <section class="input-wrapper">
-            @{
-                if (errors.Length > 0)
-                {
-                    hasErrorHere = errors[0]
-                                    .Select(x => x.ErrorMessage)
-                                    .FirstOrDefault(x => x.Contains("Полето")) != null;
-                }
-
-
-            }
-
             <span class="number">@(!hasErrorHere ? newHtmlSampleIndex : "") </span>
             @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
             {
                 <div class="error-message" asp-validation-summary="ModelOnly"></div>
                 <textarea asp-for="TempRawHtml" rows="10" cols="70">@Model.TempRawHtml</textarea>
-                <span class="error-message" asp-validation-for="TempRawHtml"></span>
-                <input type="hidden" asp-for="@Model.CurrentHtmlSample.Id" />
+                <span class="error-message" asp-validation-for="@Model.TempRawHtml"></span>
+                <input type="hidden" id="hidden-id" asp-for="@Model.CurrentHtmlSample.Id" />
                 <section class="button-wrapper">
                     <input class="submit-button" type="submit" name="submitButton" value="Run" />
                     <input class="submit-button" type="submit" name="submitButton" value="Save" />
-                    <input class="submit-button" type="submit" name="submitButton" value="Check original" />
+                    <input class="submit-button" type="submit" name="submitButton" disabled="@(Model.CurrentHtmlSample?.Id == null ? "disabled" : null)" value="Check original" />
                 </section>
             }
         </section>
-
         <section class="samples-list-wrapper">
             <span class="samples-list-title">Html Samples:</span>
 
             @{
+                var id = Model.CurrentHtmlSample?.Id;
                 for (int i = 0; i <= htmlSamples.Count - 1; i++)
                 {
                     <section class="sample-wrapper">
@@ -65,15 +57,12 @@
                             <span>@(htmlSamples.Count - i).</span>
                             @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
                             {
-                                <input type="hidden" name="htmlSampleId" value="@htmlSamples[i].Id" />
+                                <input type="hidden" asp-for="@id" id="hidden-@id-@i" value="@htmlSamples[i].Id" />
                                 <input type="submit" style="background-color: darkgrey" value="Open" />
                             }
                             <span>Created on: @htmlSamples[i].CreatedOn</span>
                             <span>Last edited on: @htmlSamples[i].LastEditedOn</span>
-
-
                         </section>
-
                         <section class="second-row">
                             <input type="text" value="@htmlSamples[i].Url" id="@htmlSamples[i].Id" />
                             <button onclick=copyUrl("@htmlSamples[i].Id")>Copy shareable Url</button>
@@ -83,36 +72,27 @@
             }
         </section>
     </article>
-
     <article class="right">
         <section class="preview">
-            @if (this.TempData["Run"] != null)
+            @if (this.TempData["submitButton"] as string == "Run")
             {
-                <span class="preview-content">
-                    @Html.Raw($"<fragment>{tempRawHtml}</fragment>")
-
-                </span>
-
+                <fragment class="preview-content">@Html.Raw(Model.TempRawHtml?.ToString())</fragment>
             }
         </section>
     </article>
 </article>
 
-
 @{
-    if (this.TempData["checkOriginal"] != null)
+    if (this.TempData["submitButton"] as string == "Check original")
     {
         var value = Model.IsEqualWithOriginal == true ? "equal" : "not equal";
-
         <script>checkOriginal(`@(value)`)</script>
-
     }
 
-    if (this.TempData["submitButton"] != null)
+    if (this.TempData["submitButton"] as string == "Save")
     {
-        var submitButtonValue = this.TempData["submitButton"];
+        var submitButtonValue = this.TempData["save-action-type"];
         var number = htmlSamples.Count - currentHtmlSampleIndex;
-
         <script>showSaveNotification(@number, '@submitButtonValue');</script>
     }
 }

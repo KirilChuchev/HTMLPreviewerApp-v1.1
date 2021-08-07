@@ -5,7 +5,7 @@
 
     public class HtmlSampleShareViewModel
     {
-        public string Rawhtml { get; set; }
+        public string RawHtml { get; set; }
 
         public ApplicationUser User { get; set; }
 

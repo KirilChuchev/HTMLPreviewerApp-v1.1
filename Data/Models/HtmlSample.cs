@@ -6,11 +6,12 @@
 
     public class HtmlSample
     {
-        public HtmlSample(string userId)
+        public HtmlSample(string userId, string rawHtml)
         {
             this.Id = Guid.NewGuid().ToString();
             this.CreatedOn = DateTime.Now;
-            this.UserId = userId; 
+            this.UserId = userId;
+            this.RawHtml = rawHtml;
         }
 
         [Key]

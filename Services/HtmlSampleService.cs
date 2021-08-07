@@ -3,6 +3,7 @@
     using HTMLPreviewerApp.Data;
     using HTMLPreviewerApp.Data.Models;
     using HTMLPreviewerApp.Models.HtmlSample;
+    using HTMLPreviewerApp.Models.HTMLSample;
     using Microsoft.EntityFrameworkCore;
     using System;
     using System.Collections.Generic;
@@ -17,30 +18,20 @@
         {
             this.dbContext = dbContext;
         }
-        public async Task<HtmlSample> SaveHtmlSample(HtmlSample htmlSample)
+
+        public async Task<string> SaveHtmlSample(HtmlSampleHomeViewModel homeModel)
         {
-            var entity = await this.dbContext.HtmlSamples.AddAsync(htmlSample);
+            var id =
+                homeModel.CurrentHtmlSample.Id == null
+                ? await this.SaveNewHtmlSample(homeModel)
+                : await this.EditHtmlSample(homeModel);
 
-            await this.dbContext.SaveChangesAsync();
-
-            return entity.Entity;
+            return id;
         }
 
-        public async Task<HtmlSample> EditHtmlSample(string htmlSampleId, string rawHtml)
+        public async Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSampleViewModelsByUserId(string userId)
         {
-            var entity = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == htmlSampleId);
-
-            entity.RawHtml = rawHtml;
-            entity.LastEditedOn = DateTime.Now;
-
-            await this.dbContext.SaveChangesAsync();
-
-            return entity;
-        }
-
-        public async Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSamplesAsViewModel(ApplicationUser currentUser)
-        {
-            return await this.dbContext.HtmlSamples.Where(x => x.UserId == currentUser.Id).Select(x => new HtmlSampleViewModel
+            return await this.dbContext.HtmlSamples.Where(x => x.UserId == userId).Select(x => new HtmlSampleViewModel()
             {
                 Id = x.Id,
                 RawHtml = x.RawHtml,
@@ -60,7 +51,7 @@
             {
                 return null;
             }
-            return new HtmlSampleViewModel
+            return new HtmlSampleViewModel()
             {
                 Id = htmlSample.Id,
                 RawHtml = htmlSample.RawHtml,
@@ -70,7 +61,36 @@
                 UserId = htmlSample.UserId,
                 Url = $"https://localhost:44382/HtmlSample/Share?htmlSampleId={htmlSample.Id}"
             };
+        }
 
+        public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel)
+        {
+            var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.CurrentHtmlSample.Id);
+
+            return htmlSample.RawHtml == homeModel.TempRawHtml;
+        }
+
+        private async Task<string> SaveNewHtmlSample(HtmlSampleHomeViewModel homeModel)
+        {
+            var entity = await this.dbContext
+                                   .HtmlSamples
+                                   .AddAsync(new HtmlSample(homeModel.CurrentHtmlSample.UserId, homeModel.TempRawHtml));
+
+            await this.dbContext.SaveChangesAsync();
+
+            return entity.Entity.Id;
+        }
+
+        private async Task<string> EditHtmlSample(HtmlSampleHomeViewModel homeModel)
+        {
+            var entity = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.CurrentHtmlSample.Id);
+
+            entity.RawHtml = homeModel.TempRawHtml;
+            entity.LastEditedOn = DateTime.Now;
+
+            await this.dbContext.SaveChangesAsync();
+
+            return entity.Id;
         }
     }
 }
