@@ -55,7 +55,7 @@
                     <section class="sample-wrapper">
                         <section class="first-row">
                             <span>@(htmlSamples.Count - i).</span>
-                            @using (Html.BeginForm("Index", "HtmlSample", FormMethod.Get))
+                            @using (Html.BeginForm("Open", "HtmlSample", FormMethod.Post))
                             {
                                 <input type="hidden" asp-for="@id" id="hidden-@id-@i" value="@id" />
                                 <input type="submit" style="background-color: darkgrey" value="Open" />
