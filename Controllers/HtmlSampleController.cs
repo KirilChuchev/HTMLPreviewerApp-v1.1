@@ -77,6 +77,13 @@
             return this.RedirectToAction("Index", "HtmlSample", new { id });
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Open(string id)
+        {
+            return this.RedirectToAction("Index", "HtmlSample", new { id });
+        }
+
         [AllowAnonymous]
         public async Task<IActionResult> Share(string htmlSampleId)
         {
