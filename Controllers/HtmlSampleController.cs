@@ -21,13 +21,6 @@
             this.userManager = userManager;
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public IActionResult Open(string id)
-        {
-            return this.RedirectToAction("Index", "HtmlSample", new { id });
-        }
-
         public async Task<IActionResult> Index(string id)
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
@@ -81,6 +74,13 @@
                     break;
             }
 
+            return this.RedirectToAction("Index", "HtmlSample", new { id });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Open(string id)
+        {
             return this.RedirectToAction("Index", "HtmlSample", new { id });
         }
 
