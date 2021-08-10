@@ -9,7 +9,8 @@
         {
             var scheme = request.HttpContext.Request.Scheme;
             var hostName = request.Host.Value;
-            var controllerName = request.RouteValues.Select(x => x.Value).ToArray()[1];
+            //var controllerName = request.RouteValues.Select(x => x.Value).ToArray()[1];
+            var controllerName = request.RouteValues.FirstOrDefault(x => x.Key == "controller").Value;
 
             return $"{scheme}://{hostName}/{controllerName}/{sharableActionName}/{htmlSampleId}";
         }
