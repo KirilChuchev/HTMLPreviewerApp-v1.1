@@ -1,7 +1,6 @@
 ﻿namespace HTMLPreviewerApp.Controllers
 {
     using HTMLPreviewerApp.Data.Models;
-    using HTMLPreviewerApp.Helper_Services;
     using HTMLPreviewerApp.Models.HtmlSample;
     using HTMLPreviewerApp.Models.HTMLSample;
     using HTMLPreviewerApp.Services;
@@ -27,7 +26,13 @@
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
 
+            var scheme = this.Request.HttpContext.Request.Scheme;
+            var hostName = this.Request.Host.Value;
+            var actionName = nameof(this.Share);
+            var controllerName = this.Request.RouteValues.Select(x => x.Value).ToArray()[1];
+
             var currentHtmlSample = await this.htmlSampleService.GetHtmlSampleById(id);
+
 
             var currentHtmlSampleViewModel = currentHtmlSample != null ? new HtmlSampleViewModel()
             {
@@ -49,7 +54,7 @@
                 LastEditedOn = x.LastEditedOn,
                 User = x.User,
                 UserId = x.UserId,
-                Url = URLGenerator.Generate(this.Request, nameof(this.Share), x.Id),
+                Url = $"{scheme}://{hostName}/{controllerName}/{actionName}/{x.Id}"
             }).ToArray();
 
             var homeModel = new HtmlSampleHomeViewModel()
