@@ -14,6 +14,10 @@
 
         public HtmlSampleViewModel CurrentHtmlSample { get; set; }
 
+        //public string Id { get; set; }
+
+        //public string OriginalRawhtml { get; set; }
+
         public string TempRawHtml { get; set; }
 
         public bool IsEqualWithOriginal { get; set; }
