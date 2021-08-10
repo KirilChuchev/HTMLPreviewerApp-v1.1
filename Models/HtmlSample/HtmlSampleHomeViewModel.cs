@@ -12,15 +12,15 @@
             this.HtmlSamples = new HashSet<HtmlSampleViewModel>();
         }
 
-        public HtmlSampleViewModel CurrentHtmlSample { get; set; }
+        public string Id { get; set; }
 
-        //public string Id { get; set; }
+        public string OriginalRawhtml { get; set; }
 
-        //public string OriginalRawhtml { get; set; }
+        public string UserId { get; set; }
 
         public string TempRawHtml { get; set; }
 
-        public bool IsEqualWithOriginal { get; set; }
+        public bool? IsEqualWithOriginal { get; set; }
 
         public ICollection<HtmlSampleViewModel> HtmlSamples { get; set; }
 
