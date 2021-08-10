@@ -6,15 +6,10 @@
 @{
     ViewData["Title"] = "Home Page";
     var htmlSamples = Model?.HtmlSamples?.OrderByDescending(x => x.CreatedOn).ToList();
-    //var currentHtmlSample = Model?.CurrentHtmlSample;
 
-    //var currentHtmlSampleIndex =
-    //    currentHtmlSample != null
-    //    ? htmlSamples?.FindIndex(x => x.CreatedOn.ToString().Equals(currentHtmlSample?.CreatedOn.ToString(), StringComparison.Ordinal))
-    //    : null;
-
-    //var newHtmlSampleIndex = $"{htmlSamples.Count - currentHtmlSampleIndex}{(currentHtmlSample != null ? "." : "")}";
-    var newHtmlSampleIndex = "0-0";
+    var currentHtmlSampleIndex = Model.Id != null
+        ? $"{htmlSamples.Count - htmlSamples.FindIndex(x => x.RawHtml == Model.OriginalRawhtml)}."
+        : string.Empty;
 }
 
 @{
@@ -32,7 +27,9 @@
 <article class="main-wrapper">
     <article class="left">
         <section class="input-wrapper">
-            <span class="number">@(!hasErrorHere ? newHtmlSampleIndex : "") </span>
+           
+            <span class="number">@(!hasErrorHere ? $"{currentHtmlSampleIndex}" : string.Empty)</span>
+
             @using (Html.BeginForm("SwitchAction", "HtmlSample", FormMethod.Post))
             {
                 <div class="error-message" asp-validation-summary="ModelOnly"></div>
@@ -93,7 +90,6 @@
     if (this.TempData["submitButton"] as string == "Save")
     {
         var submitButtonValue = this.TempData["save-action-type"];
-        var number = 1-1;
-        <script>showSaveNotification(@number, '@submitButtonValue');</script>
+        <script>showSaveNotification(@currentHtmlSampleIndex, '@submitButtonValue');</script>
     }
 }
