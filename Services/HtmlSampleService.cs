@@ -21,7 +21,7 @@
         public async Task<string> SaveHtmlSample(HtmlSampleHomeViewModel homeModel)
         {
             var id =
-                homeModel.CurrentHtmlSample.Id == null
+                homeModel.Id == null
                 ? await this.SaveNewHtmlSample(homeModel)
                 : await this.EditHtmlSample(homeModel);
 
@@ -38,18 +38,19 @@
             return await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == htmlSampleId);
         }
 
-        public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel)
+        public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeViewModel)
         {
-            var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.CurrentHtmlSample.Id);
+            //var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeViewModel.CurrentHtmlSample.Id);
 
-            return htmlSample.RawHtml == homeModel.TempRawHtml;
+            //return htmlSample.RawHtml == homeViewModel.TempRawHtml;
+            return false;
         }
 
         private async Task<string> SaveNewHtmlSample(HtmlSampleHomeViewModel homeModel)
         {
             var entity = await this.dbContext
                                    .HtmlSamples
-                                   .AddAsync(new HtmlSample(homeModel.CurrentHtmlSample.UserId, homeModel.TempRawHtml));
+                                   .AddAsync(new HtmlSample(homeModel.UserId, homeModel.TempRawHtml));
 
             await this.dbContext.SaveChangesAsync();
 
@@ -58,7 +59,7 @@
 
         private async Task<string> EditHtmlSample(HtmlSampleHomeViewModel homeModel)
         {
-            var entity = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.CurrentHtmlSample.Id);
+            var entity = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeModel.Id);
 
             entity.RawHtml = homeModel.TempRawHtml;
             entity.LastEditedOn = DateTime.Now;
