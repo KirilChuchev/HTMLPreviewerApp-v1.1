@@ -1,14 +1,13 @@
 ﻿namespace HTMLPreviewerApp.Services
 {
-    using HTMLPreviewerApp.Data;
-    using HTMLPreviewerApp.Data.Models;
-    using HTMLPreviewerApp.Models.HtmlSample;
-    using HTMLPreviewerApp.Models.HTMLSample;
-    using Microsoft.EntityFrameworkCore;
     using System;
-    using System.Collections.Generic;
     using System.Linq;
+    using HTMLPreviewerApp.Data;
     using System.Threading.Tasks;
+    using System.Collections.Generic;
+    using HTMLPreviewerApp.Data.Models;
+    using Microsoft.EntityFrameworkCore;
+    using HTMLPreviewerApp.Models.HTMLSample;
 
     public class HtmlSampleService : IHtmlSampleService
     {
@@ -29,38 +28,14 @@
             return id;
         }
 
-        public async Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSampleViewModelsByUserId(string userId)
+        public async Task<ICollection<HtmlSample>> GetAllHtmlSamplesByUserId(string userId)
         {
-            return await this.dbContext.HtmlSamples.Where(x => x.UserId == userId).Select(x => new HtmlSampleViewModel()
-            {
-                Id = x.Id,
-                RawHtml = x.RawHtml,
-                CreatedOn = x.CreatedOn,
-                LastEditedOn = x.LastEditedOn,
-                User = x.User,
-                UserId = x.UserId,
-                Url = $"https://localhost:44382/HtmlSample/Share?htmlSampleId={x.Id}"
-            }).ToArrayAsync();
-
+            return await this.dbContext.HtmlSamples.Where(x => x.UserId == userId).ToArrayAsync();
         }
 
-        public async Task<HtmlSampleViewModel> GetHtmlSampleViewModelById(string htmlSampleId)
+        public async Task<HtmlSample> GetHtmlSampleById(string htmlSampleId)
         {
-            var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == htmlSampleId);
-            if (htmlSample == null)
-            {
-                return null;
-            }
-            return new HtmlSampleViewModel()
-            {
-                Id = htmlSample.Id,
-                RawHtml = htmlSample.RawHtml,
-                CreatedOn = htmlSample.CreatedOn,
-                LastEditedOn = htmlSample.LastEditedOn,
-                User = htmlSample.User,
-                UserId = htmlSample.UserId,
-                Url = $"https://localhost:44382/HtmlSample/Share?htmlSampleId={htmlSample.Id}"
-            };
+            return await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == htmlSampleId);
         }
 
         public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel)
