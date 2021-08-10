@@ -7,6 +7,7 @@
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
+    using System.Linq;
     using System.Threading.Tasks;
 
     [Authorize]
@@ -25,13 +26,41 @@
         {
             var currentUser = await this.userManager.GetUserAsync(this.User);
 
-            var currentHtmlSample = await this.htmlSampleService.GetHtmlSampleViewModelById(id);
+            var scheme = this.Request.HttpContext.Request.Scheme;
+            var hostName = this.Request.Host.Value;
+            var actionName = nameof(this.Share);
+            var controllerName = this.Request.RouteValues.Select(x => x.Value).ToArray()[1];
+
+            var currentHtmlSample = await this.htmlSampleService.GetHtmlSampleById(id);
+
+
+            var currentHtmlSampleViewModel = currentHtmlSample != null ? new HtmlSampleViewModel()
+            {
+                Id = currentHtmlSample.Id,
+                RawHtml = currentHtmlSample.RawHtml,
+                CreatedOn = currentHtmlSample.CreatedOn,
+                LastEditedOn = currentHtmlSample.LastEditedOn,
+                User = currentHtmlSample.User,
+                UserId = currentHtmlSample.UserId,
+                Url = $"https://localhost:44382/HtmlSample/Share?htmlSampleId={currentHtmlSample.Id}"
+            } : null;
+
+            var currentUserHtmlSamples = await this.htmlSampleService.GetAllHtmlSamplesByUserId(currentUser.Id);
+            var currentUserHtmlSampleViewModels = currentUserHtmlSamples.Select(x => new HtmlSampleViewModel()
+            {
+                Id = x.Id,
+                RawHtml = x.RawHtml,
+                CreatedOn = x.CreatedOn,
+                LastEditedOn = x.LastEditedOn,
+                User = x.User,
+                UserId = x.UserId,
+                Url = $"{scheme}://{hostName}/{controllerName}/{actionName}/{x.Id}"
+            }).ToArray();
 
             var homeModel = new HtmlSampleHomeViewModel()
             {
-                CurrentHtmlSample = currentHtmlSample,
-                HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id),
-                TempRawHtml = this.TempData["tempRawHtml"] as string,
+                CurrentHtmlSample = currentHtmlSampleViewModel,
+                HtmlSamples = currentUserHtmlSampleViewModels,
             };
 
             homeModel.TempRawHtml = TempData["tempRawHtml"] as string ?? homeModel.CurrentHtmlSample?.RawHtml;
@@ -48,10 +77,22 @@
 
             if (!this.ModelState.IsValid)
             {
-                homeModel.HtmlSamples = await this.htmlSampleService.GetAllHtmlSampleViewModelsByUserId(currentUser.Id);
+                var currentUserHtmlSamples = await this.htmlSampleService.GetAllHtmlSamplesByUserId(currentUser.Id);
+                var currentUserHtmlSampleViewModels = currentUserHtmlSamples.Select(x => new HtmlSampleViewModel()
+                {
+                    Id = x.Id,
+                    RawHtml = x.RawHtml,
+                    CreatedOn = x.CreatedOn,
+                    LastEditedOn = x.LastEditedOn,
+                    User = x.User,
+                    UserId = x.UserId,
+                    Url = $"https://localhost:44382/HtmlSample/Share?htmlSampleId={x.Id}"
+                }).ToArray();
+
+                homeModel.HtmlSamples = currentUserHtmlSampleViewModels;
                 return this.View("Index", homeModel);
             }
-            
+
             string id;
             this.TempData["submitButton"] = submitButton;
             this.TempData["tempRawHtml"] = homeModel.TempRawHtml;
@@ -85,15 +126,16 @@
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Share(string htmlSampleId)
+        public async Task<IActionResult> Share(string id)
         {
-            var htmlSample = await this.htmlSampleService.GetHtmlSampleViewModelById(htmlSampleId);
+            var currentHtmlSample = await this.htmlSampleService.GetHtmlSampleById(id);
+
             var model = new HtmlSampleShareViewModel()
             {
-                RawHtml = htmlSample.RawHtml,
-                User = await this.userManager.FindByIdAsync(htmlSample.UserId),
-                CreatedOn = htmlSample.CreatedOn,
-                LastEditedOn = htmlSample.LastEditedOn,
+                RawHtml = currentHtmlSample.RawHtml,
+                User = await this.userManager.FindByIdAsync(currentHtmlSample.UserId),
+                CreatedOn = currentHtmlSample.CreatedOn,
+                LastEditedOn = currentHtmlSample.LastEditedOn,
             };
             return View(model);
         }

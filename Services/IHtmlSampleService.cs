@@ -1,6 +1,6 @@
 ﻿namespace HTMLPreviewerApp.Services
 {
-    using HTMLPreviewerApp.Models.HtmlSample;
+    using HTMLPreviewerApp.Data.Models;
     using HTMLPreviewerApp.Models.HTMLSample;
     using System.Collections.Generic;
     using System.Threading.Tasks;
@@ -9,9 +9,9 @@
     {
         Task<string> SaveHtmlSample(HtmlSampleHomeViewModel homeModel);
 
-        Task<ICollection<HtmlSampleViewModel>> GetAllHtmlSampleViewModelsByUserId(string userId);
+        Task<ICollection<HtmlSample>> GetAllHtmlSamplesByUserId(string userId);
 
-        Task<HtmlSampleViewModel> GetHtmlSampleViewModelById(string htmlSampleId);
+        Task<HtmlSample> GetHtmlSampleById(string htmlSampleId);
 
         Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel);
     }
