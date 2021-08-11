@@ -39,7 +39,7 @@
                 <section class="button-wrapper">
                     <input class="submit-button" type="submit" name="submitButton" value="Run" />
                     <input class="submit-button" type="submit" name="submitButton" value="Save" />
-                    <input class="submit-button" type="submit" name="submitButton" disabled="@(Model?.Id == null ? "disabled" : null)" value="Check original" />
+                    <input class="submit-button" type="submit" name="submitButton" value="Check original" />
                 </section>
             }
         </section>
@@ -83,7 +83,7 @@
 @{
     if (this.TempData["submitButton"] as string == "Check original")
     {
-        var value = Model.IsEqualWithOriginal == true ? "equal" : "not equal";
+        var value = Model.IsEqualWithOriginal == true ? "NOT original" : "original";
         <script>checkOriginal(`@(value)`)</script>
     }
 
@@ -93,3 +93,21 @@
         <script>showSaveNotification(@currentHtmlSampleIndex, '@submitButtonValue');</script>
     }
 }
+
+<script>
+    function checkOriginal(value) {
+        alert(`This sample is ${value}.`);
+    }
+
+    function showSaveNotification(number, notificationText) {
+        alert(`HTML Sample #${number}. was ${notificationText}!`);
+    }
+
+    function copyUrl(id) {
+        let copyUrlText = document.getElementById(id);
+        copyUrlText.select();
+        copyUrlText.setSelectionRange(0, 99999)
+        document.execCommand("copy");
+        alert("Copied URL: " + copyUrlText.value);
+    }
+</script>
