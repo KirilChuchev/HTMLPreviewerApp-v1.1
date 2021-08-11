@@ -48,7 +48,7 @@
                 }).ToArray(),
             };
 
-            homeViewModel.IsEqualWithOriginal = homeViewModel?.OriginalRawhtml == homeViewModel?.TempRawHtml;
+            homeViewModel.IsEqualWithOriginal = this.TempData["checkOriginal"] as bool?;
 
             return this.View(homeViewModel);
         }
@@ -92,6 +92,7 @@
                     id = await htmlSampleService.SaveHtmlSample(homeViewModel);
                     break;
                 case "Check original":
+                    this.TempData["checkOriginal"] = await this.htmlSampleService.CheckOriginal(homeViewModel);
                     id = homeViewModel.Id;
                     break;
                 default:

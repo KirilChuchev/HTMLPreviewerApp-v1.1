@@ -13,6 +13,6 @@
 
         Task<HtmlSample> GetHtmlSampleById(string htmlSampleId);
 
-        Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeModel);
+        Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeViewModel);
     }
 }
