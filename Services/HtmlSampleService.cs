@@ -40,11 +40,6 @@
 
         public async Task<bool> CheckOriginal(HtmlSampleHomeViewModel homeViewModel)
         {
-            //var htmlSample = await this.dbContext.HtmlSamples.FirstOrDefaultAsync(x => x.Id == homeViewModel.CurrentHtmlSample.Id);
-
-            //return htmlSample.RawHtml == homeViewModel.TempRawHtml;
-            //return false;
-
             var entity = await this.dbContext
                                     .HtmlSamples
                                     .FirstOrDefaultAsync(x => x.Id != homeViewModel.Id && x.RawHtml == homeViewModel.TempRawHtml);

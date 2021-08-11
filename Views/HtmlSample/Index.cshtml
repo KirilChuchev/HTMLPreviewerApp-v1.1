@@ -93,21 +93,3 @@
         <script>showSaveNotification(@currentHtmlSampleIndex, '@submitButtonValue');</script>
     }
 }
-
-<script>
-    function checkOriginal(value) {
-        alert(`This sample is ${value}.`);
-    }
-
-    function showSaveNotification(number, notificationText) {
-        alert(`HTML Sample #${number}. was ${notificationText}!`);
-    }
-
-    function copyUrl(id) {
-        let copyUrlText = document.getElementById(id);
-        copyUrlText.select();
-        copyUrlText.setSelectionRange(0, 99999)
-        document.execCommand("copy");
-        alert("Copied URL: " + copyUrlText.value);
-    }
-</script>
